@@ -30,6 +30,11 @@ jobs:
           cd /tmp/app
           flutter pub add firebase_core cloud_firestore firebase_auth shared_preferences
           cp $GITHUB_WORKSPACE/*.dart lib/
+          mkdir -p web/icons
+          cp $GITHUB_WORKSPACE/Icon-*.png web/icons/
+          cp $GITHUB_WORKSPACE/favicon.png web/favicon.png
+          cp $GITHUB_WORKSPACE/manifest.json web/manifest.json
+          sed -i 's/mkandabwe_hub/Mkandabwe Hub/g' web/index.html
 
       - name: Build web
         working-directory: /tmp/app
