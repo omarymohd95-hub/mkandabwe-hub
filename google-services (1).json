@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "570835819387",
+    "project_id": "mkandabwe-hub",
+    "storage_bucket": "mkandabwe-hub.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:570835819387:android:0bd6159ba52fca4a1b3bde",
+        "android_client_info": {
+          "package_name": "com.mkandabwe.mkandabwe_hub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0E885M7RMdoW29Iy9MscnfVfJDoQwHSc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
