@@ -1,0 +1,55 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create Flutter project and add our code
+        run: |
+          flutter create --platforms=android --org com.mkandabwe --project-name mkandabwe_hub /tmp/app
+          cd /tmp/app
+          flutter pub add firebase_core cloud_firestore firebase_auth shared_preferences
+          cp $GITHUB_WORKSPACE/*.dart lib/
+          python3 $GITHUB_WORKSPACE/make_options.py lib/firebase_options.dart
+
+      - name: Android settings and icons
+        working-directory: /tmp/app
+        run: |
+          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 24/' android/app/build.gradle.kts || true
+          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 24/' android/app/build.gradle || true
+          sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <application#' android/app/src/main/AndroidManifest.xml
+          sed -i 's/android:label="mkandabwe_hub"/android:label="Mkandabwe Hub"/' android/app/src/main/AndroidManifest.xml
+          cp $GITHUB_WORKSPACE/ic_48.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp $GITHUB_WORKSPACE/ic_72.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp $GITHUB_WORKSPACE/ic_96.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp $GITHUB_WORKSPACE/ic_144.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp $GITHUB_WORKSPACE/Icon-maskable-192.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+      - name: Build APK
+        working-directory: /tmp/app
+        run: flutter build apk --release
+
+      - name: Publish APK to Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp /tmp/app/build/app/outputs/flutter-apk/app-release.apk Mkandabwe-Hub.apk
+          gh release delete apk-latest --yes --cleanup-tag || true
+          gh release create apk-latest Mkandabwe-Hub.apk --title "Mkandabwe Hub (Android)" --notes "Pakua Mkandabwe-Hub.apk na uisakinishe kwenye simu ya Android."
