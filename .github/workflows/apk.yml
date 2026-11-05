@@ -25,16 +25,16 @@ jobs:
         run: |
           flutter create --platforms=android --org com.mkandabwe --project-name mkandabwe_hub /tmp/app
           cd /tmp/app
-          flutter pub add firebase_core cloud_firestore firebase_auth shared_preferences
+          flutter pub add firebase_core cloud_firestore firebase_auth shared_preferences firebase_messaging
           cp $GITHUB_WORKSPACE/*.dart lib/
-          python3 $GITHUB_WORKSPACE/make_options.py lib/firebase_options.dart
+          python3 $GITHUB_WORKSPACE/make_options.py lib/firebase_options.dart android/app/src/main/res/values/firebase_resources.xml
 
       - name: Android settings and icons
         working-directory: /tmp/app
         run: |
           sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 24/' android/app/build.gradle.kts || true
           sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 24/' android/app/build.gradle || true
-          sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <application#' android/app/src/main/AndroidManifest.xml
+          sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <application#' android/app/src/main/AndroidManifest.xml
           sed -i 's/android:label="mkandabwe_hub"/android:label="Mkandabwe Hub"/' android/app/src/main/AndroidManifest.xml
           cp $GITHUB_WORKSPACE/ic_48.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
           cp $GITHUB_WORKSPACE/ic_72.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
